@@ -33,10 +33,6 @@ void *memchr_opt(const void *src_void, int c, size_t length)
     const unsigned char *src = (const unsigned char *) src_void;
     unsigned char d = c;
 
-    printf("%p\n", src);
-    printf("%ld\n", (long)src);
-    printf("%ld\n", sizeof(src));
-    printf("%ld\n", UNALIGNED(src));
     /* If the length of input string is shorter than 8 */
     while (UNALIGNED(src)) {
         if (!length--)
