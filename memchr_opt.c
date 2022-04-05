@@ -33,7 +33,11 @@ void *memchr_opt(const void *src_void, int c, size_t length)
     const unsigned char *src = (const unsigned char *) src_void;
     unsigned char d = c;
 
-    /* If the length of input string is shorter than 8 */
+    /* Dealing with the length of input string is shorter than 8.
+     * Check each character in the input string sequentially. If there was the
+     * character we are finding, return the rest of the string. Otherwise, this
+     * function will return NULL.
+     */
     while (UNALIGNED(src)) {
         if (!length--)
             return NULL;
@@ -61,12 +65,14 @@ void *memchr_opt(const void *src_void, int c, size_t length)
             mask = (mask << i) | mask;
 
         /* Switch 8 bytes at a time. In other word, we can check 8 characters
-         * at a time.
+         * at a time. Because the while-loop can only find out the character is
+         * inside or not, the variable 'length' need to be minus 8
          */
         while (length >= LBLOCKSIZE) {
             if (DETECT_CHAR(*asrc, mask))
                 break;
             asrc++;
+            length -= sizeof(long);
         }
 
         /* If there are fewer than LBLOCKSIZE characters left, then we resort to
@@ -75,6 +81,9 @@ void *memchr_opt(const void *src_void, int c, size_t length)
         src = (unsigned char *) asrc;
     }
 
+    /* Check the next 8 character if we already found the character. Otherwise,
+     * we check the rest of the string.
+     */
     while (length--) {
         if (*src == d)
             return (void *) src;
@@ -87,9 +96,9 @@ void *memchr_opt(const void *src_void, int c, size_t length)
 int main()
 {
     const char str[] = "http://wiki.csie.ncku.edu.tw";
-    const char ch = '.';
+    const char ch = 'b';
 
-    printf("%ld\n", strlen(str));
+    // printf("%ld\n", strlen(str));
     char *ret = memchr_opt(str, ch, strlen(str));
     printf("String after |%c| is - |%s|\n", ch, ret);
     return 0;
