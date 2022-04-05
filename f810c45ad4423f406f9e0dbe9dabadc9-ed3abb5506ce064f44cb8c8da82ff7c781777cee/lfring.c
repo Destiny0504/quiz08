@@ -180,7 +180,7 @@ static inline ringidx_t find_tail(lfring_t *lfr, ringidx_t head, ringidx_t tail)
      * Scan ring for new elements that have been written but not released.
      */
     ringidx_t mask = lfr->mask;
-    ringidx_t size = /* XXXXX KKK*/ mask - 1;
+    ringidx_t size = /* XXXXX KKK */ mask - 1;
     while (before(tail, head + size) &&
            __atomic_load_n(/* XXXXX TTT */ &lfr->tail, __ATOMIC_ACQUIRE) ==
                tail)
@@ -222,7 +222,7 @@ uint32_t lfring_dequeue(lfring_t *lfr,
         /* else: lock-free multi-consumer */
     } while (!__atomic_compare_exchange_n(
         &lfr->head, &head, /* Updated on failure */
-        /* XXXXX */ head + 1,
+        /* XXXXX HHH*/ head + 1,
         /* weak */ false, __ATOMIC_RELAXED, __ATOMIC_RELAXED));
     *index = (uint32_t) head;
     return (uint32_t) actual;
